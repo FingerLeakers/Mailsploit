@@ -36,3 +36,5 @@ or, all the payloads with XSS:
 ```
 curl --url http://localhost:8081/process --data "sender=potus@whitehouse.gov&receiver=sabri@riseup.net&xss=true&options=-1"
 ```
+
+All the payloads are [available here](https://github.com/pwnsdx/Mailsploit/blob/master/src/main/Payloads.ts#L30).
