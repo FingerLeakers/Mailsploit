@@ -1,4 +1,4 @@
-![Mailsploit logo](https://raw.githubusercontent.com/pwnsdx/Mailsploit/master/resources/logo.png)
+![Mailsploit logo](https://raw.githubusercontent.com/pwnsdx/Mailsploit/master/resources/logo.png?fuckgithubcache=1)
 
 ### Mailsploit Server
 
