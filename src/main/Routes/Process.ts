@@ -15,10 +15,13 @@ const handler: express.Handler = async (req, res): Promise<express.Response> => 
     return res.status(500).send({error: 'Content is missing.'});
   }
 
-  if (typeof req.body.email === 'string' && typeof req.body.options === 'object') {
+  if (
+    typeof req.body.receiver === 'string' &&
+    typeof req.body.sender === 'string' &&
+    typeof req.body.options === 'string'
+  ) {
     try {
-      await dispatcher.dispatch(req.body.email, req.body.options, req.body.xss);
-      //dispatcher.init();
+      await dispatcher.dispatch(req.body.receiver, req.body.sender, req.body.options, req.body.xss);
     } catch (error) {
       // log this error
       console.log(error);
@@ -30,6 +33,6 @@ const handler: express.Handler = async (req, res): Promise<express.Response> => 
   return res.status(500).send({error: 'Unknown error happened.'});
 };
 
-router.post('/', bodyParser.json(), handler);
+router.post('/', bodyParser.urlencoded({extended: false}), handler);
 
 export = router;

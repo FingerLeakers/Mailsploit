@@ -8,9 +8,12 @@ import * as Process from './Routes/Process';
 import * as express from 'express';
 import * as helmet from 'helmet';
 import {PayloadDirectoryCount} from './Payloads';
+import {Config} from './Config';
+
+const environment = process.env.NODE_ENV || 'development';
 
 export class Server {
-  private app: express.Application;
+  private app: any;
   constructor() {}
 
   public start() {
@@ -40,13 +43,26 @@ export class Server {
       }),
     );
 
+    // Access Control Origin enforcement
+    if (environment.toLowerCase() === 'production') {
+      this.app.use((req, res, next) => {
+        res.setHeader('Access-Control-Allow-Origin', 'https://www.mailsploit.com');
+        return next();
+      });
+    } else {
+      this.app.use((req, res, next) => {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        return next();
+      });
+    }
+
     // Routes
-    this.app.use('/', Home);
+    //this.app.use('/', Home);
     this.app.use('/process', Process);
 
     // Error logic
     this.app.use((req, res, next) => {
-      res.status(404).send('Oops! Page not found.');
+      res.status(403).send('');
     });
     this.app.use((err, req, res, next) => {
       console.log(err.stack);

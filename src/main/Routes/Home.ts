@@ -7,7 +7,7 @@ import * as express from 'express';
 
 const router: express.Router = express.Router();
 const handler: express.Handler = (req, res) => {
-  res.send('Come back soon.');
+  res.send('');
 };
 
 router.get('/', handler);

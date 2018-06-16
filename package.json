@@ -1,28 +1,21 @@
 {
   "author": "Sabri Haddouche",
   "dependencies": {
-    "@types/express": "4.0.39",
-    "@types/node": "8.0.34",
-    "@types/nodemailer": "^4.3.1",
-    "body-parser": "^1.18.2",
-    "btoa": "^1.1.2",
-    "express": "4.16.2",
-    "helmet": "3.9.0",
-    "nodemailer": "^4.4.0"
+    "@types/express": "4.16.0",
+    "@types/node": "10.3.3",
+    "@types/nodemailer": "4.6.0",
+    "body-parser": "1.18.3",
+    "btoa": "1.2.1",
+    "escape-html": "1.0.3",
+    "express": "4.16.3",
+    "helmet": "3.12.1",
+    "nodemailer": "4.6.7"
   },
   "devDependencies": {
-    "cross-env": "5.1.1",
-    "husky": "0.14.3",
-    "jasmine": "2.8.0",
-    "karma": "1.7.1",
-    "karma-chrome-launcher": "2.2.0",
-    "karma-jasmine": "1.1.0",
-    "karma-jasmine-diff-reporter": "1.1.1",
-    "karma-sourcemap-loader": "0.3.7",
-    "lint-staged": "5.0.0",
-    "prettier": "1.8.2",
+    "lint-staged": "7.2.0",
+    "prettier": "1.13.5",
     "rimraf": "2.6.2",
-    "typescript": "2.6.1"
+    "typescript": "2.9.2"
   },
   "description": "Mailsploit Server",
   "license": "GPL-3.0",
@@ -36,7 +29,7 @@
   "name": "mailsploit-server",
   "repository": {
     "type": "git",
-    "url": "https://localhost"
+    "url": "https://github.com/pwnsdx/mailsploit"
   },
   "scripts": {
     "start": "node ./dist/commonjs/index.js",
@@ -46,11 +39,8 @@
     "postversion": "git push && git push --tags",
     "precommit": "lint-staged",
     "preversion": "yarn && yarn dist && yarn test",
-    "test:browser": "true",
-    "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine",
-    "test": "yarn lint && yarn dist && yarn test:node && yarn test:browser",
     "version": "yarn dist"
   },
   "types": "./dist/commonjs/index.d.ts",
-  "version": "0.1.0"
+  "version": "1.0.4"
 }
