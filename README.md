@@ -1,10 +1,10 @@
 ![Mailsploit logo](https://raw.githubusercontent.com/pwnsdx/Mailsploit/master/resources/logo.png)
 
-#### Mailsploit Server
+### Mailsploit Server
 
 *Note*: You will need an Amazon SES account with a verified domain in order to use the tool.
 
-How to install:
+#### How to install
 
 1. Clone the repository
 2. Edit `originalFrom` in `src/main/Config.ts` with your verified SES email address.
@@ -12,7 +12,8 @@ How to install:
 ```
 yarn install && yarn dist # Require yarn
 ```
-How to launch the web server:
+
+#### How to launch the web server
 
 1. Run the following command in the terminal:
 ```
@@ -20,7 +21,7 @@ SES_USERNAME=[Amazon SES Username] SES_PASSWORD=[Amazon SES Password] node dist/
 ```
 2. That's it. The server will run on localhost:8081
 
-How to use it:
+#### How to use it
 
 You can do a POST request containing `sender`, `receiver` and `options` (from 0 to 13) parameters to the `/process` endpoint.
 
