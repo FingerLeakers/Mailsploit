@@ -2,7 +2,7 @@
 
 ### Mailsploit Server
 
-*Note*: You will need an Amazon SES account with a verified domain in order to use the tool.
+*Note*: You will need an Amazon SES account with a verified domain in order to use the tool. Also, the web server can only run at 88 miles per hour.
 
 #### How to install
 
